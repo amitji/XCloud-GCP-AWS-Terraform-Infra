@@ -32,5 +32,5 @@ module "lb" {
   image = var.image
   instance_type = var.instance_type
   # sg-allow-http = module.vpc.
-  vpc-id = module.vpc[0].vpc-id
+  vpc-id = module.vpc[0].vpc-id.id
 }
