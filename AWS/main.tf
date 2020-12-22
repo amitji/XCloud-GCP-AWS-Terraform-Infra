@@ -28,9 +28,10 @@ module "vpc" {
 }
 
 module "lb" {
+  count   = var.enable_autoscaling ? 1:0
   source  = "./modules/lb"
   image = var.image
   instance_type = var.instance_type
-  # sg-allow-http = module.vpc.
-  vpc-id = module.vpc[0].vpc-id
+  sg-allow-http = module.vpc[0].sg-allow-http
+  # vpc-id = module.vpc[0].vpc-id
 }

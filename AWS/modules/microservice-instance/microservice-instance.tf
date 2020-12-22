@@ -5,7 +5,5 @@ resource "aws_instance" "apps" {
   tags = {  
     Name = "app"
   }
-  # security_groups = [module.sg.sg_name]
 
-  # user_data = file("./web/server-script.sh")
 }

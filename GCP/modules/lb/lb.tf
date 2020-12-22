@@ -23,13 +23,13 @@ resource "google_compute_backend_service" "backend_service" {
   port_name             = "http"
   protocol              = "HTTP"
   backend {
-    group                 = "${element(google_compute_instance_group_manager.webservers.*.instance_group, 0)}"
+    group                 = "${element(google_compute_instance_group_manager.webservers-group-manager.*.instance_group, 0)}"
     balancing_mode        = "RATE"
     max_rate_per_instance = 100
   }
 
   backend {
-    group                 = "${element(google_compute_instance_group_manager.webservers.*.instance_group, 1)}"
+    group                 = "${element(google_compute_instance_group_manager.webservers-group-manager.*.instance_group, 1)}"
     balancing_mode        = "RATE"
     max_rate_per_instance = 100
   }
@@ -44,11 +44,11 @@ resource "google_compute_http_health_check" "healthcheck" {
   request_path = "/"
 }
 
-resource "google_compute_instance_group_manager" "webservers" {
+resource "google_compute_instance_group_manager" "webservers-group-manager" {
   name               = "${var.name}-instance-group-manager-${count.index}"
   project            = "${var.project}"
   base_instance_name = "${var.name}-webserver-instance"
-  count              = "${var.lb_count}"
+  count              = "${var.webserver_count}"
   zone               = "${element(var.zones, count.index)}"
 
   version{
@@ -63,11 +63,11 @@ resource "google_compute_instance_group_manager" "webservers" {
 }
 
 resource "google_compute_autoscaler" "autoscaler" {
+  count   = "${var.webserver_count}"
   name    = "${var.name}-scaler-${count.index}"
   project = "${var.project}"
-  count   = "${var.lb_count}"
   zone    = "${element(var.zones, count.index)}"
-  target  = "${element(google_compute_instance_group_manager.webservers.*.self_link, count.index)}"
+  target  = "${element(google_compute_instance_group_manager.webservers-group-manager.*.self_link, count.index)}"
 
   autoscaling_policy {
     max_replicas    = 2

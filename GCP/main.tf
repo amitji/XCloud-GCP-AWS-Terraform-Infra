@@ -14,7 +14,7 @@ module "microservice-instance" {
 module "database" {
   count  = var.no_of_db_instances
   source = "./modules/database"
-  nat_ip = module.microservice-instance.nat_ip
+  nat_ip = module.microservice-instance[0].nat_ip[0]
   no_of_db_instances = var.no_of_db_instances
 }
 
@@ -24,7 +24,7 @@ module "lb" {
   name              = "${var.name}"
   project           = "${var.project}"
   region            = "${var.region}"
-  lb_count          = "${var.appserver_count}"
+  webserver_count   = "${var.webserver_count}"
   instance_template = "${module.instance-template.instance_template}"
   zones             = "${var.zones}"
 }

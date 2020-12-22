@@ -7,9 +7,9 @@ variable "env" { default = "dev" }
 variable "network_name" {default = "xcloud network"}
 variable "image" {default="ami-0947d2ba12ee1ff75"}
 
-variable "appserver_count" { default = 0 }
+variable "appserver_count" { default = 2 }
 # variable "app_image" { default = "centos-7-v20170918" }
 variable "instance_type" { default = "t2.micro" }
-variable "no_of_db_instances"{ default = 0 }
+variable "no_of_db_instances"{ default = 1 }
 variable "create_default_vpc"{ default = true }
-variable "enable_autoscaling" {default = false}
+variable "enable_autoscaling" {default = true}
