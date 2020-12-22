@@ -31,35 +31,6 @@ module "lb" {
   source  = "./modules/lb"
   image = var.image
   instance_type = var.instance_type
-  # region = var.region
-  # zones = var.zones
-  sg-allow-http = module.vpc.sg-allow-http
+  # sg-allow-http = module.vpc.
+  vpc-id = module.vpc[0].vpc-id
 }
-
-/* 
-module "lb" {
-  count             = var.enable_autoscaling ? 1:0
-  source            = "./modules/lb"
-  name              = "${var.name}"
-  project           = "${var.project}"
-  region            = "${var.region}"
-  lb_count          = "${var.appserver_count}"
-  instance_template = "${module.instance-template.instance_template}"
-  zones             = "${var.zones}"
-}
-
-module "instance-template" {
-  source        = "./modules/instance-template"
-  name          = "${var.project}"
-  env           = "${var.env}"
-  project       = "${var.project}"
-  region        = "${var.region}"
-  network_name  = "${var.network_name}"
-  source_image  = "${var.source_image}"
-  app_instance_type = "${var.app_instance_type}"
-  enable_autoscaling  = "${var.enable_autoscaling}"
-  
-}
-
-
-*/
