@@ -1,0 +1,9 @@
+AWS/terraform*
+AWS/.terraform
+AWS/terraform.tfstate
+AWS/.DS_Store
+GCP/terraform*
+GCP/.terraform
+GCP/terraform.tfstate
+GCP/.DS_Store
+
