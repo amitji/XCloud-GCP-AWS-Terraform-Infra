@@ -20,18 +20,20 @@ module "database" {
   no_of_db_instances = var.no_of_db_instances
 }
 
-module "vpc" {
-  count = var.create_default_vpc ? 1:0
-  source = "./modules/vpc"
-  region = var.region
-  zones = var.zones
-}
+# module "vpc" {
+#   count = var.create_default_vpc ? 1:0
+#   source = "./modules/vpc"
+#   region = var.region
+#   zones = var.zones
+# }
 
 module "lb" {
   count   = var.enable_autoscaling ? 1:0
   source  = "./modules/lb"
+  region = var.region
+  zones = var.zones
   image = var.image
   instance_type = var.instance_type
-  sg-allow-http = module.vpc[0].sg-allow-http
+  # sg-allow-http = module.vpc[0].sg-allow-http
   # vpc-id = module.vpc[0].vpc-id
 }
