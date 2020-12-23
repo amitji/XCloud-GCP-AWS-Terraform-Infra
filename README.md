@@ -6,7 +6,11 @@ A simple applications where you need webservers to serve the traffic from across
 Will create following resources for both AWS and GCP - 
 
   a. VM machines
-  b. sql database  
+  
+  b. sql database
+  
   c. vpc,firewalls 
+  
   d. web-server 
+  
   e. load balancer, auto scaler
