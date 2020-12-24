@@ -105,9 +105,6 @@ resource "aws_elb" "webserver_elb" {
 
 
 
-
-
-
 resource "aws_autoscaling_group" "webserver-asg" {
   name = "${aws_launch_configuration.webserver-lc.name}-asg"
 

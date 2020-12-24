@@ -1,7 +1,7 @@
 variable "name" {default="xcloud-project"}
 variable "project" {default = ""}
-variable "region" {default = "eu-west1"}
-variable "zones" { default = ["europe-west3-a", "europe-west3-b"] }
+variable "region" {default = "eu-west2"}
+variable "zones" { default = ["europe-west2-a", "europe-west2-b"] }
 variable "env" { default = "dev" }
 variable "network_name" {default = "xcloud network"}
 variable "source_image" {default="ubuntu-os-cloud/ubuntu-1804-lts"}
