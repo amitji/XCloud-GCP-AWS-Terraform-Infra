@@ -5,5 +5,6 @@ AWS/.DS_Store
 GCP/terraform*
 GCP/.terraform
 GCP/terraform.tfstate
-GCP/.DS_Store
-
+GCP/.DS_Stor
+GCP/terraform.tfstate.backup
+GCP/.terraform.tfstate.lock.info

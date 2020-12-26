@@ -1,25 +1,52 @@
-resource "google_compute_global_forwarding_rule" "global_forwarding_rule" {
-  name       = "${var.name}-global-forwarding-rule"
-  project    = "${var.project}"
-  target     = "${google_compute_target_http_proxy.target_http_proxy.self_link}"
-  port_range = "80"
+
+resource "google_compute_instance_group_manager" "webservers-group-manager" {
+  name               = "${var.name}-instance-group-manager-${count.index}"
+  project            = var.project
+  base_instance_name = "${var.name}-webserver-instance"
+  count              = var.webserver_count
+  zone               = "${element(var.zones, count.index)}"
+
+  version{
+    name = "ws1"
+    # instance_template  = "${module.instance-template.instance-template}"
+    instance_template  = var.ws-instance_template
+  }
+  named_port {
+    name = "http"
+    port = 80
+  }
 }
 
-resource "google_compute_target_http_proxy" "target_http_proxy" {
-  name        = "${var.name}-proxy"
-  project     = "${var.project}"
-  url_map     = "${google_compute_url_map.url_map.self_link}"
+resource "google_compute_autoscaler" "autoscaler" {
+  count   = var.webserver_count
+  name    = "${var.name}-scaler-${count.index}"
+  project = var.project
+  zone    = "${element(var.zones, count.index)}"
+  target  = "${element(google_compute_instance_group_manager.webservers-group-manager.*.self_link, count.index)}"
+
+  autoscaling_policy {
+    max_replicas    = 2
+    min_replicas    = 1
+    cooldown_period = 90
+
+    cpu_utilization {
+      target = 0.8
+    }
+  }
 }
 
-resource "google_compute_url_map" "url_map" {
-  name            = "${var.name}-url-map"
-  project         = "${var.project}"
-  default_service = "${google_compute_backend_service.backend_service.self_link}"
+
+resource "google_compute_http_health_check" "healthcheck" {
+  name         = "${var.name}-healthcheck"
+  project      = var.project
+  port         = 80
+  request_path = "/"
 }
+
 
 resource "google_compute_backend_service" "backend_service" {
   name                  = "${var.name}-backend-service"
-  project               = "${var.project}"
+  project               = var.project
   port_name             = "http"
   protocol              = "HTTP"
   backend {
@@ -37,46 +64,31 @@ resource "google_compute_backend_service" "backend_service" {
   health_checks = ["${google_compute_http_health_check.healthcheck.self_link}"]
 }
 
-resource "google_compute_http_health_check" "healthcheck" {
-  name         = "${var.name}-healthcheck"
-  project      = "${var.project}"
-  port         = 80
-  request_path = "/"
+
+resource "google_compute_url_map" "url_map" {
+  name            = "${var.name}-url-map"
+  project         = var.project
+  default_service = "${google_compute_backend_service.backend_service.self_link}"
+}
+resource "google_compute_target_http_proxy" "target_http_proxy" {
+  name        = "${var.name}-proxy"
+  project     = var.project
+  url_map     = "${google_compute_url_map.url_map.self_link}"
+}
+resource "google_compute_global_forwarding_rule" "global_forwarding_rule" {
+  name       = "${var.name}-global-forwarding-rule"
+  project    = var.project
+  target     = "${google_compute_target_http_proxy.target_http_proxy.self_link}"
+  port_range = "80"
 }
 
-resource "google_compute_instance_group_manager" "webservers-group-manager" {
-  name               = "${var.name}-instance-group-manager-${count.index}"
-  project            = "${var.project}"
-  base_instance_name = "${var.name}-webserver-instance"
-  count              = "${var.webserver_count}"
-  zone               = "${element(var.zones, count.index)}"
 
-  version{
-    name = "ws1"
-    # instance_template  = "${module.instance-template.instance-template}"
-    instance_template  = "${var.instance_template}"
-  }
-  named_port {
-    name = "http"
-    port = 80
-  }
-}
 
-resource "google_compute_autoscaler" "autoscaler" {
-  count   = "${var.webserver_count}"
-  name    = "${var.name}-scaler-${count.index}"
-  project = "${var.project}"
-  zone    = "${element(var.zones, count.index)}"
-  target  = "${element(google_compute_instance_group_manager.webservers-group-manager.*.self_link, count.index)}"
 
-  autoscaling_policy {
-    max_replicas    = 2
-    min_replicas    = 1
-    cooldown_period = 90
 
-    cpu_utilization {
-      target = 0.8
-    }
-  }
-}
+
+
+
+
+
 

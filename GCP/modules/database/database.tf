@@ -10,30 +10,19 @@ resource "google_sql_database_instance" "postgres" {
 
     ip_configuration {
       
-        # authorized_networks {
-        #   value           = "0.0.0.0/0"
-        #   name            = "all"
-        # }
-      dynamic "authorized_networks" {
-        for_each = var.nat_ip
-        iterator = ip
-        content {
-          # value = each.key
-          value = ip.value
+        authorized_networks {
+          value           = "0.0.0.0/0"
+          name            = "all"
         }
-      }
-
       # dynamic "authorized_networks" {
-      #   for_each = locals.onprem
-      #   iterator = onprem
+      #   for_each = toset(var.nat_ip)
+      #   iterator = ip
       #   content {
-      #     name  = "onprem-${onprem.key}"
-      #     value = onprem.value
+      #     # value = each.key
+      #     value = ip.value
       #   }
       # }
+
     }
   }
-}
-locals {
-  # onprem = ["192.168.1.2", "192.168.2.3"]
 }

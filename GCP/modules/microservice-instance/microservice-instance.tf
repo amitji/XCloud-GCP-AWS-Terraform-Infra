@@ -3,19 +3,22 @@ resource "random_id" "app_name_suffix" {
 }
 
 resource "google_compute_instance" "apps" {
-  # count        = var.appserver_count
-  # name         = "apps-${count.index + 1}"
   name         = "apps-${random_id.app_name_suffix.hex}"
-  machine_type = "f1-micro"
+  machine_type = var.instance_type
+  for_each = toset(var.zones )
+  zone = each.key
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-1804-lts"
+      image = var.image
     }
   }
 
   network_interface {
-    network = "default"
+    # network = "default"
+    # network = "google_compute_network.xcloud-vpc.self_link" 
+    network = var.vpc-name
+    subnetwork = var.subnet-self_link
 
     access_config {
       // Ephemeral IP
