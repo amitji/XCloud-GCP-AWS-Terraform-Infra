@@ -8,3 +8,4 @@ GCP/terraform.tfstate
 GCP/.DS_Stor
 GCP/terraform.tfstate.backup
 GCP/.terraform.tfstate.lock.info
+GCP/terraform.tfstate

@@ -1,22 +1,22 @@
-resource "aws_vpc" "xcloud-vpc" {
-  cidr_block       = "10.0.0.0/16"
-  enable_dns_hostnames = true
+# resource "aws_vpc" "xcloud-vpc" {
+#   cidr_block       = "10.0.0.0/16"
+#   enable_dns_hostnames = true
 
-  tags = {
-    Name = "xcloud-vpc"
-  }
-}
+#   tags = {
+#     Name = "xcloud-vpc"
+#   }
+# }
 
-resource "aws_subnet" "public_subnet" {
-  vpc_id     = aws_vpc.xcloud-vpc.id
-  cidr_block = "10.0.0.0/24"
-  for_each = toset(var.zones)
-  availability_zone = each.key
+# resource "aws_subnet" "public_subnet" {
+#   vpc_id     = aws_vpc.xcloud-vpc.id
+#   cidr_block = "10.0.0.0/24"
+#   for_each = toset(var.zones)
+#   availability_zone = each.key
 
-  tags = {
-    Name = each.key
-  }
-}
+#   tags = {
+#     Name = each.key
+#   }
+# }
 
 
 resource "aws_launch_configuration" "webserver-lc" {
@@ -49,8 +49,8 @@ resource "aws_launch_configuration" "webserver-lc" {
 resource "aws_security_group" "elb-sg" {
   name        = "elb-sg"
   description = "Allow HTTP traffic through Elastic Load Balancer"
-  vpc_id = aws_vpc.xcloud-vpc.id
-  # vpc_id = var.vpc-id
+  # vpc_id = aws_vpc.xcloud-vpc.id
+  vpc_id = var.vpc-id
 
   ingress {
     from_port   = 80
@@ -73,16 +73,18 @@ resource "aws_security_group" "elb-sg" {
 
 resource "aws_elb" "webserver_elb" {
   name = "webserver-elb"
-  security_groups = [
-    aws_security_group.elb-sg.id
-  ]
-  # count = lenght(aws_subnet.public_subnet)
-  for_each = aws_subnet.public_subnet
-  subnets = [each.value.id]
-  # subnets = [element(aws_subnet.public_subnet, 0), element(aws_subnet.public_subnet, 1)]
+  
+  # security_groups = [
+  #   aws_security_group.elb-sg.id
+  # ]
+  # count = "${length(var.zones)}"
+  # availability_zones = "${var.zones[count.index]}"
+  availability_zones = toset(var.zones)
+  # # count = lenght(aws_subnet.public_subnet)
+  # for_each = aws_subnet.public_subnet
+  # subnets = [each.value.id]
+  # # subnets = [element(aws_subnet.public_subnet, 0), element(aws_subnet.public_subnet, 1)]
 
-
-  # subnets = [aws_subnet.public_subnet[0].id]
 
   cross_zone_load_balancing   = true
 
@@ -113,10 +115,11 @@ resource "aws_autoscaling_group" "webserver-asg" {
   max_size             = 3
   
   health_check_type    = "ELB"
-  for_each = aws_elb.webserver_elb
-  load_balancers = [ each.value.id
-    # aws_elb.webserver_elb.id
-  ]
+
+  availability_zones = toset(var.zones)
+
+  # for_each = aws_elb.webserver_elb
+  load_balancers = [aws_elb.webserver_elb.id]
 
   launch_configuration = aws_launch_configuration.webserver-lc.name
 
