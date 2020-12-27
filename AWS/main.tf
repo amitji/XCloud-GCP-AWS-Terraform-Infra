@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 # Include modules
-
+# create microservices/apps in each zone
 module "microservice-instance" {
   count = var.appserver_count
   source = "./modules/microservice-instance"
@@ -16,7 +16,7 @@ module "microservice-instance" {
   zones = var.zones
 }
 
-
+# create load balancer, auto scaling 
 module "lb" {
   count   = var.enable_autoscaling ? 1:0
   source  = "./modules/lb"
@@ -28,6 +28,7 @@ module "lb" {
   vpc-id = module.vpc.vpc-id
 }
 
+#create VPC and subnets
 module "vpc" {
   # count = var.create_default_vpc ? 1:0
   source = "./modules/vpc"
@@ -36,6 +37,7 @@ module "vpc" {
   
 }
 
+#create a postgres sql database
 module "database" {
   count  = var.no_of_db_instances
   source = "./modules/database"
