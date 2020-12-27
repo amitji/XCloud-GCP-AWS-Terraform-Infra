@@ -14,3 +14,5 @@ variable instance_type { default = "f1-micro" }
 variable no_of_db_instances{ default = 1 }
 # variable create_default_vpc{ default = true }
 variable enable_autoscaling {default = true}
+variable db_user {}
+variable db_password {}

@@ -7,13 +7,17 @@ provider "google" {
 
 # Include modules
 
+#create a postgres sql database
 module "database" {
   count  = var.no_of_db_instances
   source = "./modules/database"
   # nat_ip = module.microservice-instance[0].nat_ip[0]
   no_of_db_instances = var.no_of_db_instances
+  db_user = var.db_user
+  db_password = var.db_password
 }
 
+# create load balancer, auto scaling 
 module "lb" {
   count             = var.enable_autoscaling ? 1:0
   source            = "./modules/lb"
@@ -25,7 +29,7 @@ module "lb" {
   zones             = var.zones
 }
 
-# Amit NOT Valid comment - module instance-template Not neeeded since webserver instances are being created in lb module...
+#create an instance template for webserver for auto scaling
 module "instance-template" {
   source        = "./modules/instance-template"
   name          = var.project
@@ -39,7 +43,7 @@ module "instance-template" {
   enable_autoscaling  = var.enable_autoscaling
 }
 
-#### tested , works fine
+# create microservices/apps in each zone
 module "microservice-instance" {
   count = var.appserver_count
   source = "./modules/microservice-instance"
@@ -50,10 +54,10 @@ module "microservice-instance" {
   vpc-name = module.vpc.vpc-name
   subnet-self_link = module.vpc.subnet-self_link
 }
+
+#create VPC and subnets
 module "vpc" {
-  # count = var.create_default_vpc ? 1:0
   source = "./modules/vpc"
   region = var.region
   name = var.name
 }
-
