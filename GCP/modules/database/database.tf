@@ -15,14 +15,6 @@ resource "google_sql_database_instance" "postgres_db" {
           value           = "0.0.0.0/0"
           name            = "all"
         }
-      # dynamic "authorized_networks" {
-      #   for_each = toset(var.nat_ip)
-      #   iterator = ip
-      #   content {
-      #     # value = each.key
-      #     value = ip.value
-      #   }
-      # }
 
     }
   }
